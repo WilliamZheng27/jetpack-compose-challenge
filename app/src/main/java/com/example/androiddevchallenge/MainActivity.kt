@@ -19,7 +19,12 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.MaterialTheme
@@ -32,18 +37,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.os.bundleOf
-import androidx.navigation.NavArgumentBuilder
 import androidx.navigation.NavController
 import androidx.navigation.NavType
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navArgument
+import androidx.navigation.compose.navigate
+import androidx.navigation.compose.rememberNavController
 import com.example.androiddevchallenge.model.Cat
 import com.example.androiddevchallenge.test.DataStore
 import com.example.androiddevchallenge.ui.theme.MyTheme
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,9 +69,11 @@ fun MyApp() {
     Surface(color = MaterialTheme.colors.background) {
         NavHost(navController = navController, startDestination = "listPet") {
             composable("listPet") { PetList(listPet = DataStore.generateCatList(), navController = navController) }
-            composable("pet_profile/{pet}", arguments = listOf(navArgument("pet") { NavType.StringType })) { backStackEntry -> PetProfile(
-                pet =  Json.decodeFromString(backStackEntry.arguments?.get("pet") as String)
-            ) }
+            composable("pet_profile/{pet}", arguments = listOf(navArgument("pet") { NavType.StringType })) { backStackEntry ->
+                PetProfile(
+                    pet = Json.decodeFromString(backStackEntry.arguments?.get("pet") as String)
+                )
+            }
         }
     }
 }
@@ -80,11 +88,14 @@ fun PetList(navController: NavController, listPet: List<Cat>) {
 }
 
 @Composable
-fun PetItem(navController: NavController, index:Int, pet: Cat) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally,modifier = Modifier.clickable {
-        val petSerialized = Json.encodeToString(pet)
-        navController.navigate("pet_profile/$petSerialized")
-    }) {
+fun PetItem(navController: NavController, index: Int, pet: Cat) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable {
+            val petSerialized = Json.encodeToString(pet)
+            navController.navigate("pet_profile/$petSerialized")
+        }
+    ) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(40.dp, 0.dp)) {
             Text(index.toString(), fontSize = 14.sp)
             Spacer(Modifier.size(10.dp))
@@ -129,4 +140,3 @@ fun DarkPreview() {
         MyApp()
     }
 }
-
